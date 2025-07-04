@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flocking Balls with Video Collision</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #222;
+    }
+    #container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+    /* Canvas for boids */
+    #flock-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      background: #222;
+      pointer-events: none;
+    }
+    /* Video obstacle */
+    #video-obstacle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 60vw;
+      max-width: 800px;
+      border-radius: 8px;
+      z-index: 1;
+      object-fit: cover;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    }
+    /* Title */
+    #title {
+      position: absolute;
+      top: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      color: #fff;
+      font-size: 2rem;
+      font-family: sans-serif;
+      text-shadow: 0 0 8px rgba(0, 0, 0, 0.7);
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <canvas id="flock-canvas"></canvas>
+    <video id="video-obstacle" autoplay muted loop playsinline>
+      <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4" />
+      Your browser does not support HTML5 video.
+    </video>
+    <h2 id="title">Flocking Balls Around Video</h2>
+  </div>
+
+  <script>
+    // Wait for video metadata so we can get its size
+    window.addEventListener('DOMContentLoaded', () => {
+      const video = document.getElementById('video-obstacle');
+      video.addEventListener('loadedmetadata', () => {
+        initFlock(video);
+      });
+    });
+
+    function initFlock(video) {
+      const canvas = document.getElementById('flock-canvas');
+      const ctx = canvas.getContext('2d');
+
+      // Resize canvas to full window
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        updateVideoBounds();
+      }
+      window.addEventListener('resize', resizeCanvas);
+      resizeCanvas();
+
+      // Track video bounds in canvas coordinates (centered origin)
+      let videoBounds = { left: 0, right: 0, top: 0, bottom: 0 };
+      function updateVideoBounds() {
+        const rect = video.getBoundingClientRect();
+        const halfW = window.innerWidth / 2;
+        const halfH = window.innerHeight / 2;
+        videoBounds.left   = rect.left   - halfW;
+        videoBounds.right  = rect.left   - halfW + rect.width;
+        videoBounds.top    = halfH       - (rect.top + rect.height);
+        videoBounds.bottom = halfH       - rect.top;
+      }
+      window.addEventListener('resize', updateVideoBounds);
+      updateVideoBounds();
+
+      // Boid parameters
+      const NUM_BOIDS = 80;
+      const MAX_SPEED = 2.0;
+      const MAX_FORCE = 0.05;
+
+      // Helper: Vector operations
+      function createVec(x, y) { return { x, y }; }
+      function add(v1, v2) { return { x: v1.x + v2.x, y: v1.y + v2.y }; }
+      function sub(v1, v2) { return { x: v1.x - v2.x, y: v1.y - v2.y }; }
+      function mul(v, n)  { return { x: v.x * n,   y: v.y * n   }; }
+      function div(v, n)  { return { x: v.x / n,   y: v.y / n   }; }
+      function mag(v)     { return Math.hypot(v.x, v.y); }
+      function normalize(v) {
+        const m = mag(v) || 1;
+        return { x: v.x / m, y: v.y / m };
+      }
+      function limit(v, max) {
+        const m = mag(v);
+        if (m > max) return mul(normalize(v), max);
+        return v;
+      }
+
+      // Boid class
+      class Boid {
+        constructor() {
+          // Position in canvas-centered coords:
+          this.pos = createVec(
+            (Math.random() - 0.5) * canvas.width,
+            (Math.random() - 0.5) * canvas.height
+          );
+          // Velocity
+          const angle = Math.random() * 2 * Math.PI;
+          this.vel = createVec(Math.cos(angle), Math.sin(angle));
+          this.acc = createVec(0, 0);
+        }
+
+        applyForce(f) {
+          this.acc = add(this.acc, f);
+        }
+
+        // Flocking: separation, alignment, cohesion
+        flock(boids) {
+          let sep = createVec(0, 0);
+          let ali = createVec(0, 0);
+          let coh = createVec(0, 0);
+          let cntS = 0, cntA = 0, cntC = 0;
+          const neighDist = 50;
+
+          for (let other of boids) {
+            if (other === this) continue;
+            const d = mag(sub(this.pos, other.pos));
+            if (d < neighDist && d > 0) {
+              // Separation
+              const diff = normalize(sub(this.pos, other.pos));
+              sep = add(sep, div(diff, d));
+              cntS++;
+
+              // Alignment & cohesion for mid-range
+              if (d < 30) {
+                ali = add(ali, other.vel);
+                cntA++;
+                coh = add(coh, other.pos);
+                cntC++;
+              }
+            }
+          }
+          // Separation
+          if (cntS > 0) {
+            sep = div(sep, cntS);
+            sep = normalize(sep);
+            sep = mul(sep, MAX_SPEED);
+            sep = sub(sep, this.vel);
+            sep = limit(sep, MAX_FORCE);
+            this.applyForce(sep);
+          }
+          // Alignment
+          if (cntA > 0) {
+            ali = div(ali, cntA);
+            ali = normalize(ali);
+            ali = mul(ali, MAX_SPEED);
+            ali = sub(ali, this.vel);
+            ali = limit(ali, MAX_FORCE);
+            this.applyForce(ali);
+          }
+          // Cohesion
+          if (cntC > 0) {
+            coh = div(coh, cntC);
+            const steer = sub(coh, this.pos);
+            const desired = normalize(steer);
+            const dvel = mul(desired, MAX_SPEED);
+            let cohForce = sub(dvel, this.vel);
+            cohForce = limit(cohForce, MAX_FORCE);
+            this.applyForce(cohForce);
+          }
+        }
+
+        // Bounce off video rectangle
+        bounceVideo() {
+          const nextPos = add(this.pos, this.vel);
+          if (
+            nextPos.x > videoBounds.left &&
+            nextPos.x < videoBounds.right &&
+            nextPos.y > videoBounds.top &&
+            nextPos.y < videoBounds.bottom
+          ) {
+            // Simple bounce: invert velocity component based on which side
+            if (
+              this.pos.x < videoBounds.left &&
+              nextPos.x >= videoBounds.left
+            ) {
+              this.vel.x *= -1;
+            } else if (
+              this.pos.x > videoBounds.right &&
+              nextPos.x <= videoBounds.right
+            ) {
+              this.vel.x *= -1;
+            }
+            if (
+              this.pos.y < videoBounds.top &&
+              nextPos.y >= videoBounds.top
+            ) {
+              this.vel.y *= -1;
+            } else if (
+              this.pos.y > videoBounds.bottom &&
+              nextPos.y <= videoBounds.bottom
+            ) {
+              this.vel.y *= -1;
+            }
+          }
+        }
+
+        // Bounce off window edges
+        bounceWindow() {
+          const halfW = canvas.width / 2;
+          const halfH = canvas.height / 2;
+          const nextPos = add(this.pos, this.vel);
+          if (nextPos.x > halfW || nextPos.x < -halfW) this.vel.x *= -1;
+          if (nextPos.y > halfH || nextPos.y < -halfH) this.vel.y *= -1;
+        }
+
+        update() {
+          this.vel = add(this.vel, this.acc);
+          this.vel = limit(this.vel, MAX_SPEED);
+          this.pos = add(this.pos, this.vel);
+          this.acc = createVec(0, 0);
+        }
+
+        draw() {
+          const halfW = canvas.width / 2;
+          const halfH = canvas.height / 2;
+          ctx.beginPath();
+          ctx.arc(
+            this.pos.x + halfW,
+            halfH - this.pos.y,
+            5,
+            0,
+            2 * Math.PI
+          );
+          ctx.fillStyle = '#66ccff';
+          ctx.fill();
+        }
+      }
+
+      // Initialize boids
+      const boids = [];
+      for (let i = 0; i < NUM_BOIDS; i++) {
+        boids.push(new Boid());
+      }
+
+      // Animation loop
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Update video bounds each frame in case layout shifts
+        updateVideoBounds();
+
+        // Flocking and movement
+        for (let b of boids) {
+          b.flock(boids);
+          b.bounceVideo();
+          b.bounceWindow();
+          b.update();
+          b.draw();
+        }
+        requestAnimationFrame(animate);
+      }
+      animate();
+    }
+  </script>
+</body>
+</html>

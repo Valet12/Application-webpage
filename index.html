@@ -2,19 +2,78 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Toro Rodriguez | Coming Soon</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="icon" type="image/png" href="https://img.icons8.com/ios-filled/50/coffee.png" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Home | Neon Colombia Shop</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="cart.js" defer></script>
 </head>
 <body>
-  <div class="container">
-    <h1>☕ Incredible Things Are Brewing...</h1>
-    <p>This page will be live soon. Stay tuned!</p>
+
+  <header>
+    <div class="container">
+      <div class="logo">Neon Colombia</div>
+      <nav>
+        <a href="index.html" class="active">Home</a>
+        <a href="coffee.html">Coffee</a>
+        <a href="baskets.html">Baskets</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="hero" style="background-image:url('https://via.placeholder.com/1600x900');">
+    <div class="hero-content">
+      <h1>Welcome to Neon Colombia</h1>
+      <p>Discover handcrafted coffee and surprise baskets — all infused with vibrant Colombian spirit.</p>
+      <a href="coffee.html" class="btn-primary">Shop Coffee</a>
+      <a href="baskets.html" class="btn-primary">Gift Baskets</a>
+    </div>
   </div>
 
+  <section>
+    <div class="container">
+      <h2>Featured Coffee</h2>
+      <div class="products">
+        <!-- Example product cards -->
+        <div class="card">
+          <img src="https://via.placeholder.com/300x180" alt="Espresso Roast">
+          <div class="card-body">
+            <h3>Espresso Roast</h3>
+            <p>Smooth, bold flavor.</p>
+            <span class="price">$12.00</span>
+            <a class="btn-secondary">Add to Cart</a>
+          </div>
+        </div>
+        <!-- repeat as needed -->
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <h2>Featured Baskets</h2>
+      <div class="products">
+        <div class="card">
+          <img src="https://via.placeholder.com/300x180" alt="Birthday Basket">
+          <div class="card-body">
+            <h3>Birthday Surprise</h3>
+            <p>Handmade delights for celebrations.</p>
+            <span class="price">$25.00</span>
+            <a class="btn-secondary">Add to Cart</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <footer>
-    <small>© 2025 Toro Rodriguez. All rights reserved.</small>
+    <p>
+      <a href="impressum.html">Impressum</a> |
+      <a href="cookies.html">Cookies</a> |
+      <a href="privacy.html">Privacy</a>
+    </p>
   </footer>
+
 </body>
 </html>
