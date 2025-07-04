@@ -9,6 +9,9 @@
   --light-track: #fffbe0;
   --dark-track: #ffecb3;
 }
+#vision, #about, #projects, #contact, #why-tu, #path {
+  scroll-margin-top: 1px;
+}
 
 * {
   box-sizing: border-box;

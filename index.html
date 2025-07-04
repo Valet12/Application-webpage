@@ -334,9 +334,9 @@
           Here, you'll find links to some of the programming projects I've developed separated by programming language
         </p>
         <ul class="repo-list">
-          <li><a href="#" target="_blank">Java Codes</a></li>
-          <li><a href="#" target="_blank">C++ Codes</a></li>
-          <li><a href="#" target="_blank">Python Codes</a></li>
+          <li><a href="https://drive.google.com/drive/folders/1BsDRxArkMwSy1mZIhVeqDfwzh_Jxh9Pw" target="_blank">Java Codes</a></li>
+          <li><a href="https://drive.google.com/drive/folders/1JEY4tpHaGx-ZpUbqiQOP2E-XoE9eDJPn" target="_blank">C++ Codes</a></li>
+          <li><a href="https://drive.google.com/drive/folders/1zPShkS2q-n0h9AtwxW_iDdSAh8UpnG21" target="_blank">Python Codes</a></li>
           <li><a href="https://github.com/Valet12" target="_blank">Javascript, HTML &amp; CSS Codes (GitHub)</a></li>
 
         </ul>
@@ -700,6 +700,47 @@ setTimeout(() => {
     }
     render();
   }, 500);
+</script>
+<script>
+  window.addEventListener('load', () => {
+    // Force a layout reflow to stabilize elements before interactions
+    setTimeout(() => {
+      document.body.offsetHeight; // triggers reflow
+      window.scrollTo(0, 1);      // small scroll to force repaint
+      window.scrollTo(0, 0);      // restore scroll
+    }, 100); // allow DOM to settle
+
+    // Re-initialize Vanta/particles if necessary
+    if (typeof VANTA !== 'undefined' && VANTA.NET) {
+      VANTA.NET({
+        el: "#about",
+        color: 0x000000,
+        backgroundColor: 0xffffff,
+        points: 12,
+        maxDistance: 20,
+        spacing: 18
+      });
+    }
+
+    if (typeof particlesJS !== 'undefined') {
+      particlesJS('particles-js', {
+        "particles": {
+          "number": { "value": 80, "density": { "enable": true, "value_area": 800 } },
+          "color": { "value": "#ffd500" },
+          "shape": { "type": "star", "polygon": { "nb_sides": 5 } },
+          "opacity": { "value": 0.8, "random": true },
+          "size": { "value": 3, "random": true },
+          "line_linked": { "enable": false },
+          "move": { "enable": true, "speed": 0.4 }
+        },
+        "interactivity": {
+          "events": { "onhover": { "enable": true, "mode": "grab" } },
+          "modes": { "grab": { "distance": 200, "line_linked": { "opacity": 0.8 } } }
+        },
+        "retina_detect": true
+      });
+    }
+  });
 </script>
 </body>
 </html>
