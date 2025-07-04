@@ -275,7 +275,7 @@
     <div class="future-content">
       <h2>My Vision</h2>
       <p>
-        My two biggest passions are cybersecurity and artificial intelligence. I believe both fields are essential to building the kind of digital future we can trust. My dream is to create solutions that combine the intelligence of AI with the resilience of cybersecurity — systems that are not only smart, but secure by design. I’ve already explored the cybersecurity side through projects and education, and now I want to build a stronger foundation in AI. This Master is the next step toward that vision.
+        My two biggest passions are cybersecurity and artificial intelligence. I believe both fields are essential to building the kind of digital future we can trust. My dream is to create solutions that combine the intelligence of AI with the resilience of cybersecurity, systems  not only smart, but secure by design. I've already explored the cybersecurity side through projects and education, and now I want to build a stronger foundation in AI. This Master is my next step toward that vision.
       </p>
     </div>
   </section>
@@ -348,16 +348,28 @@
   <section id="why-tu">
     <!-- 1) Three.js canvas for custom flock (must exist in DOM) -->
     <canvas id="three-canvas"></canvas>
-
-    <!-- 2) Vanta.BIRDS will automatically insert its own <canvas> here (above the video) -->
-    <!-- 3) Video sits below the birds so they can bounce off it -->
-    <video id="why-video" autoplay muted loop playsinline>
-      <source src="/media/demo1.mp4" type="video/mp4" />
-      Your browser does not support HTML5 video.
-    </video>
-
     <!-- 4) Title sits on top of everything -->
+    
+
     <h2 class="why-title">Why TU Darmstadt</h2>
+    <section id="intro-explainer" class="">
+  <div class="two-column">
+    <!-- Column 1: Image -->
+    <div class="image-column" data-aos="fade-right" data-aos-delay="200">
+      <img src="media\icontalking.png" alt="Illustration of Valeria" />
+    </div>
+
+    <!-- Column 2: Explanation -->
+    <div class="text-column" data-aos="fade-left" data-aos-delay="400" id="why-video">
+      <p>
+        I’ve always believed that learning never stops. My journey into IT, AI, and cybersecurity has shown me how
+        interconnected our world has become—and how critical it is to build systems that are both smart and secure.
+        TU Darmstadt’s program is where I believe I can deepen my expertise and contribute to a safer digital future.
+      </p>
+    </div>
+  </div>
+</section>
+
   </section>
 
   <!-- CONTACT: Icons + “Write Me a Message” Form -->
@@ -625,7 +637,7 @@ setTimeout(() => {
     const videoElem = document.getElementById('why-video');
 
     // Create a small flock of spheres (“balls”)
-    const ballRadius = 20;
+    const ballRadius = 10;
     const ballGeo    = new THREE.SphereGeometry(ballRadius, 16, 16);
     const ballMat    = new THREE.MeshBasicMaterial({ color: 0xffd500 });
     const balls      = [];
