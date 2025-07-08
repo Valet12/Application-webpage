@@ -1045,7 +1045,7 @@ footer {
   background-color: #fffdf6;           /* Soft background tone */
   text-align: center;                  /* Center the text */
   padding: 2px 2px;                  /* Balanced spacing */
-  font-size: 0.4rem;                   /* Slightly smaller font */
+  font-size: 1rem;                   /* Slightly smaller font */
   color: #555555;                      /* Softer gray text */
   border-top: 1px solid #ddd;          /* Subtle separation */
 }
